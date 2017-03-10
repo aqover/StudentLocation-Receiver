@@ -21,9 +21,6 @@ class BLE(object):
 		self.status = (lines[2].strip() == "UP RUNNING")
 		os.system("rm tmp")
 
-		if self.status == 0:
-			self.Start()
-
 	def GetMac_address(self):
 		return self.mac_address
 
@@ -38,17 +35,6 @@ class BLE(object):
 		os.system("rm tmp")
 
 		return self.status
-
-	def Start(self):
-		#Can't down device hci0: Permission denied (13)
-		os.system("sudo hciconfig hci" + str(self.hci) + " up")
-
-	def Stop(self):
-		os.system("sudo hciconfig hci" + str(self.hci) + " down")
-
-	def Restart(self):
-		self.Stop()
-		self.Start()
 		
 
 if __name__ == '__main__':

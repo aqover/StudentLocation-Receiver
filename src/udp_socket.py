@@ -1,12 +1,13 @@
 import socket
+import env
 
 class Udp(object):
 	"""docstring for Udp"""
 	def __init__(self, arg):
 		super(Udp, self).__init__()
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		self.hostname = '255.255.255.255'
-		self.port = 6417
+		self.hostname = env.HOSTNAME
+		self.port = env.PORT
 
 	def SetHost(self, host):
 		self.hostname = host

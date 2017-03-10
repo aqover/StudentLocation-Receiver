@@ -83,8 +83,6 @@ def scan():
         cmd_pkt = struct.pack("<BB", 0x01, 0x00)
         bluez.hci_send_cmd(sock, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, cmd_pkt)
 
-        
-
         time_pre = datetime.datetime.now()
         while True:
             # Save the current filter setting
