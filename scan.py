@@ -5,6 +5,9 @@ import requests
 import struct
 import threading
 
+# add environment file
+import env
+
 from src.everthing import AdPayLoad, AdInfoHeader, MetaEvent, BlueZHeader
 from src.clients import DeviceCliens, Cliens
 
@@ -13,8 +16,8 @@ DEBUG = 0
 OGF_LE_CTL = 0x08
 OCF_LE_SET_SCAN_ENABLE = 0x000C
 
-BASE_URL            = "http://locating.ojudge.in.th/"
-MAC_ADDRESS         = "66:39:21:1A:E7:B9"
+BASE_URL            = env.BASE_URL
+MAC_ADDRESS         = env.MAC_ADDRESS
 
 sock = None
 devices = DeviceCliens()
