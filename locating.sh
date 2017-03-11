@@ -60,7 +60,7 @@ update_start() {
     return 1
   fi
   echo 'Starting update service ^  ' >&2
-  local CMD="$SCRIPT_UPDATE &> \"$LOGFILE\" & echo \$!"
+  local CMD="$SCRIPT_UPDATE &> \"$LOG_UPDATE_FILE\" & echo \$!"
   su -c "$CMD" $RUNAS > "$PID_UPDATE_FILE"
   echo 'Update service started' >&2
 }
