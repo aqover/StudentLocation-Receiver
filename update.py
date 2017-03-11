@@ -28,7 +28,7 @@ def do_post_update():
 	os.system("sudo python post_update.py")
 	os.system("sudo rm post_update.py")
 
-def clear(file):
+def do_clear(file):
 	os.system("rm " + file)
 
 if __name__ == '__main__':
@@ -40,6 +40,6 @@ if __name__ == '__main__':
 			os.system("sudo /etc/init.d/locating restart")
 
 		time.sleep(300)
-		clear()
+		d0_clear(TMP_FILE)
 
 # */5 * * * * /home/fa/locating/update.py
