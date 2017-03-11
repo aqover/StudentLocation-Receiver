@@ -33,6 +33,7 @@ sudo pip install -t gattlib
 echo "Download program file"
 git clone https://github.com/aqover/StudentLocation-Receiver.git locating
 
+echo "Install crontab"
 #write out current crontab
 crontab -l > mycron
 #echo new cron into cron file

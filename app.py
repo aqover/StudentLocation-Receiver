@@ -1,7 +1,7 @@
 import os
 
 import scan
-from src.udp_socket import Upd
+from src.udp_socket import Udp
 
 class BLE(object):
 	"""docstring for BLE"""
