@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import time
 
 TMP_FILE 	= "/var/tmp/git_pull"
 DIR 		= "/home/fa/locating"
@@ -31,11 +32,14 @@ def clear(file):
 	os.system("rm " + file)
 
 if __name__ == '__main__':
-	git_pull(DIR, TMP_FILE)
-	if not check_up_to_date(TMP_FILE):
-		do_post_update()
-		os.system("sudo /etc/init.d/locating restart")
+	while 1:
+		git_pull(DIR, TMP_FILE)
+		if not check_up_to_date(TMP_FILE):
+			do_post_update()
+			time.sleep(0.5)
+			os.system("sudo /etc/init.d/locating restart")
 
-	clear()
+		time.sleep(300)
+		clear()
 
 # */5 * * * * /home/fa/locating/update.py
