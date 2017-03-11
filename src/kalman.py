@@ -4,7 +4,7 @@ class Kalman(object):
 	def __init__(self, R = 1, Q = 1, A = 1, B = 0, C = 1):
 		super(Kalman, self).__init__()
 		self._process_noise 	= R # noise power desirable
-		self._measurement_noise = Q	# // noise power desirable
+		self._measurement_noise = Q
 		self._state_vector 		= A
 		self._control_vector 	= B
 		self._measurement_vector = C

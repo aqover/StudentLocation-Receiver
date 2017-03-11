@@ -3,14 +3,14 @@ import math
 
 from src.kalman import Kalman
 
+import env
+
 def calculate_distance(rssi, tx_power = 0):
     signal_strnght_1_meter = -57 if tx_power == 0 else tx_power
     multiple_1_meter       = 2.0
     return 10.0 ** ((signal_strnght_1_meter - rssi)/(10.0*multiple_1_meter))
 
 class DeviceCliens(object):
-    rssi_smooth_contance = 0.5
-
     """docstring for DeviceCliens"""
     def __init__(self):
         super(DeviceCliens, self).__init__()
@@ -19,14 +19,13 @@ class DeviceCliens(object):
     def append(self, mac_address, rssi, tx_power):
         index = self._getIndex(mac_address)
         if index not in self.device:
-            kalman = Kalman(0.008, 1.00, 1.0, 0, 1.0)
+            kalman = Kalman(env.PROCESS_NOISE, env.NEASUREMENT_NOISE, env.STATE_VECTOR, env.CONTROL_VECTOR, env.MEASUREMENT_VECTOR)
             kalman.filter(rssi, 0)
             self.device[index] = [mac_address, tx_power, kalman, datetime.datetime.now()]
         else:
             if (datetime.datetime.now() - self.device[index][3]).total_seconds > 0.2:
                 self.device[index][2].filter(rssi, 0)
                 self.device[index][3] = datetime.datetime.now()
-
 
         """
         if index not in self.device:
@@ -36,7 +35,6 @@ class DeviceCliens(object):
             #self.device[index][1] = [[rssi*-1, datetime.datetime.now()]]
             self.device[index][3] = datetime.datetime.now()
         """
-            
 
     def get_device(self):
         output = []
@@ -51,7 +49,7 @@ class DeviceCliens(object):
                     ck = 1
                     break;
 
-                output.append({'device_mac_address': y[0], 'signal_strength': int(y[2].lastMeasurement()), 'lenght': calculate_distance(y[2].lastMeasurement(), y[1])})
+                output.append({'device_mac_address': y[0], 'signal_strength': int(y[2].lastMeasurement()), 'length': calculate_distance(y[2].lastMeasurement(), y[1])})
 
                 """
                 if (time - y[3]).total_seconds() > 10:
@@ -87,8 +85,9 @@ class DeviceCliens(object):
 
         return (sums)
 
-    def _rssi_filter(self, rssi, rssi_prev):
-        return (self.rssi_smooth_contance * rssi) + ((1.0 - self.rssi_smooth_contance)*rssi_prev)
+    def _moving_average(self, rssi, rssi_prev):
+        rssi_smooth_contance = env.MOVING_AVERAGE_CONTANCE
+        return (rssi_smooth_contance * rssi) + ((1.0 - rssi_smooth_contance)*rssi_prev)
 
 
 class Cliens(object):
