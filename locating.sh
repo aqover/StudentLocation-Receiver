@@ -56,23 +56,23 @@ uninstall() {
 
 update_start() {
   if [ -f "$PID_UPDATE_FILE" ] && kill -0 $(cat "$PID_UPDATE_FILE"); then
-    echo 'Service already running' >&2
+    echo 'Update service already running' >&2
     return 1
   fi
   echo 'Starting update service ^  ' >&2
   local CMD="$SCRIPT_UPDATE &> \"$LOGFILE\" & echo \$!"
   su -c "$CMD" $RUNAS > "$PID_UPDATE_FILE"
-  echo 'Service started' >&2
+  echo 'Update service started' >&2
 }
 
 update_stop() {
   if [ ! -f "$PID_UPDATE_FILE" ] || ! kill -0 $(cat "$PID_UPDATE_FILE"); then
-    echo 'Service not running' >&2
+    echo 'Update service not running' >&2
     return 1
   fi
   echo 'Stopping service ^  ' >&2
   kill -15 $(cat "$PID_UPDATE_FILE") && rm -f "$PID_UPDATE_FILE"
-  echo 'Service stopped' >&2
+  echo 'Update service stopped' >&2
 }
 
 case "$1" in
@@ -87,7 +87,7 @@ case "$1" in
   uninstall)
     uninstall
     ;;
-  retart)
+  restart)
     stop
     start
     ;;

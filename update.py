@@ -26,7 +26,7 @@ def check_up_to_date(file):
 
 def do_post_update():
 	os.system("sudo python post_update.py")
-	os.system("sudo rm post_update.py")
+	#os.system("sudo rm post_update.py")
 
 def do_clear(file):
 	os.system("rm " + file)
