@@ -17,6 +17,7 @@ class Udp(object):
 
 	def GetServer(self):
 		message = 'IP=?';
+		self.socket.settimeout(5.0)
 		sent = self.sock.sendto(message, self._host_address())
 
 		data, address = sock.recvfrom(1024)

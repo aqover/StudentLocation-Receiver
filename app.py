@@ -48,6 +48,7 @@ if __name__ == '__main__':
 		ip = Udp().GetServer()
 		if ip != None:
 			scan.BASE_URL = ip
+			print (ip)
 	except:
 		pass
 	scan.scan()
