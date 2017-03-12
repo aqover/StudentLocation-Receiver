@@ -91,7 +91,10 @@ case "$1" in
     stop
     start
     ;;
+  update)
+    update_start
+    ;;
   *)
-    echo "Usage: $0 {start|stop|restart|uninstall}"
+    echo "Usage: $0 {start|stop|restart|uninstall|update}"
 esac
 

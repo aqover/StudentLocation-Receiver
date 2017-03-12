@@ -40,6 +40,6 @@ if __name__ == '__main__':
 			os.system("sudo /etc/init.d/locating restart")
 
 		time.sleep(300)
-		d0_clear(TMP_FILE)
+		do_clear(TMP_FILE)
 
 # */5 * * * * /home/fa/locating/update.py
