@@ -3,7 +3,7 @@
 A python program for tracking student primary school to fix the problem of traffic jam.
 
 # How to setup this program?
-you can setup via setup.py, can get this in https://raw.githubusercontent.com/aqover/StudentLocation-Receiver/master/setup.sh
+you can setup via setup.py, get [file](https://raw.githubusercontent.com/aqover/StudentLocation-Receiver/master/setup.sh)
 
 #Enviorment file
 don't forget to create new eny.py on your machine.
