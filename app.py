@@ -43,7 +43,7 @@ class BLE(object):
 		
 
 if __name__ == '__main__':
-	time.sleep(5)
+	time.sleep(10)
 
 	device = BLE(0)
 
@@ -59,4 +59,5 @@ if __name__ == '__main__':
 			print (ip)
 	except:
 		pass
+		
 	scan.scan()

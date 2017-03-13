@@ -3,24 +3,22 @@ import datetime
 import json
 import requests
 import struct
+import time
 import threading
 
 # add environment file
 import env
 
 from src.everthing import AdPayLoad, AdInfoHeader, MetaEvent, BlueZHeader
-from src.clients import DeviceCliens, Cliens
+from src.clients import DeviceCliens
 
-DEBUG = 0
+DEBUG = env.DEBUG
 
 OGF_LE_CTL = 0x08
 OCF_LE_SET_SCAN_ENABLE = 0x000C
 
 BASE_URL            = env.BASE_URL
 MAC_ADDRESS         = env.MAC_ADDRESS
-
-sock = None
-devices = DeviceCliens()
 
 def process_input(bluez_packet):
     bluezHeader = BlueZHeader(bluez_packet[:3])
@@ -56,19 +54,19 @@ def process_input(bluez_packet):
                     tx_power = struct.unpack('>b', data[-1])[0]
     return (adInfoHeader.bdaddr, rssi, tx_power)
 
-def send():
+def send(devices):
     url = BASE_URL + 'sendLocation/' + MAC_ADDRESS
     clients = devices.get_device()
 
-    if DEBUG:
+    if DEBUG and __name__ != '__main__':
         print (clients)
     
     try:
-        r = requests.get(url, data=json.dumps({'data': clients}), headers={'content-type': 'application/json'})    
+        r = requests.get(url, data=json.dumps({'data': clients}), headers={'content-type': 'application/json'})
+        if DEBUG:
+            print (r.text.encode('utf-8').strip())  
     except Exception as e:
-        pass   
-    
-    #print (r.text.encode('utf-8').strip())
+        pass
 
 def scan():
     try:
@@ -83,6 +81,7 @@ def scan():
         cmd_pkt = struct.pack("<BB", 0x01, 0x00)
         bluez.hci_send_cmd(sock, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, cmd_pkt)
 
+        devices = DeviceCliens()
         time_pre = datetime.datetime.now()
         while True:
             # Save the current filter setting
@@ -104,11 +103,14 @@ def scan():
             time_now = datetime.datetime.now()
             
             if (time_now - time_pre).total_seconds() > 2:
-                send()
+                send(devices)
                 time_pre = time_now;
 
             #Restore the filter setting
             sock.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, old_filter) 
 
+            time.sleep(0.1)
+
 if __name__ == '__main__':
+    DEBUG = True
     scan()
