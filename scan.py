@@ -61,12 +61,13 @@ def send(devices):
     if DEBUG and __name__ != '__main__':
         print (clients)
     
-    try:
-        r = requests.get(url, data=json.dumps({'data': clients}), headers={'content-type': 'application/json'})
-        if DEBUG:
-            print (r.text.encode('utf-8').strip())  
-    except Exception as e:
-        pass
+    if not DEBUG:
+        try:
+            r = requests.get(url, data=json.dumps({'data': clients}), headers={'content-type': 'application/json'})
+            #if DEBUG:
+                #print (r.text.encode('utf-8').strip())  
+        except Exception as e:
+            pass
 
 def scan():
     try:
@@ -103,7 +104,8 @@ def scan():
             time_now = datetime.datetime.now()
             
             if (time_now - time_pre).total_seconds() > 2:
-                send(devices)
+                if not DEBUG:
+                    send(devices)
                 time_pre = time_now;
 
             #Restore the filter setting
@@ -113,4 +115,5 @@ def scan():
 
 if __name__ == '__main__':
     DEBUG = True
+    env.DEBUG = True
     scan()

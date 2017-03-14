@@ -53,7 +53,10 @@ class DeviceCliens(object):
                     break;
 
                 if env.DEBUG and y[0] == "FF:FF:40:00:15:0D":
-                    print ({'device_mac_address': y[0], 'signal_strength': int(y[2].lastMeasurement()), 'length': calculate_distance(y[2].lastMeasurement(), y[1])})
+                    if env.FILTER_RSSI == 1:
+                        print ({'device_mac_address': y[0], 'signal_strength': y[2].lastMeasurement(), 'length': calculate_distance(y[2].lastMeasurement(), y[1])})
+                    elif env.FILTER_RSSI == 2:
+                        print({'device_mac_address': y[0], 'signal_strength': int(y[2]), 'length': calculate_distance(y[2], y[1])})    
 
                 if env.FILTER_RSSI == 0:
                     pass
