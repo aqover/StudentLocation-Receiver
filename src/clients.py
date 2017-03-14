@@ -6,8 +6,12 @@ from src.kalman import Kalman
 import env
 
 def calculate_distance(rssi, tx_power = 0):
-    signal_strnght_1_meter = env.A_METER_SIGNAL if tx_power == 0 else tx_power
-    return 10.0 ** ((signal_strnght_1_meter - rssi)/(10.0 * env.A_METER_CONSTANTS))
+    A = env.A_METER_SIGNAL if tx_power == 0 else tx_power
+    n = env.A_METER_CONSTANTS
+    tx_power = -59 if tx_power == 0 else tx_power
+    dis_a = (0.89976 * 7.7095**(rssi/tx_power)) + 0.111
+    dis_b = 10.0 ** ((A - rssi)/(10.0 * n))
+    return (dis_b)
 
 def moving_average(rssi, rssi_prev):
     return (env.MOVING_AVERAGE_CONTANCE * rssi) + ((1.0 - env.MOVING_AVERAGE_CONTANCE)*rssi_prev)
@@ -22,22 +26,26 @@ class DeviceCliens(object):
         index = self._getIndex(mac_address)
         if index not in self.device:
             if env.FILTER_RSSI == 0:
-                pass
+                kalman = Kalman(env.PROCESS_NOISE, env.NEASUREMENT_NOISE, env.STATE_VECTOR, env.CONTROL_VECTOR, env.MEASUREMENT_VECTOR)
+                kalman.filter(rssi, 0)
+                self.device[index] = [mac_address, tx_power, kalman, datetime.datetime.now(), rssi]
             elif env.FILTER_RSSI == 1:
                 kalman = Kalman(env.PROCESS_NOISE, env.NEASUREMENT_NOISE, env.STATE_VECTOR, env.CONTROL_VECTOR, env.MEASUREMENT_VECTOR)
                 kalman.filter(rssi, 0)
                 self.device[index] = [mac_address, tx_power, kalman, datetime.datetime.now()]
             elif env.FILTER_RSSI == 2:
-                self.device[index] = [mac_address, tx_power, m_v.moving_average(rssi, 0), datetime.datetime.now()]            
+                self.device[index] = [mac_address, tx_power, moving_average(rssi, 0), datetime.datetime.now()]            
         else:
-            if (datetime.datetime.now() - self.device[index][3]).total_seconds > 0.2:
-                self.device[index][3] = datetime.datetime.now()
-                if env.FILTER_RSSI == 0:
-                    pass
-                elif env.FILTER_RSSI == 1:
-                    self.device[index][2].filter(rssi, 0)
-                elif env.FILTER_RSSI == 2:
-                    self.device[index][2] = m_v.moving_average(rssi, self.device[index][2])
+            #if (datetime.datetime.now() - self.device[index][3]).total_seconds > 0.2:
+            self.device[index][3] = datetime.datetime.now()
+            if env.FILTER_RSSI == 0:
+                tmp = self.device[index][2].lastMeasurement()
+                self.device[index][2].filter(rssi, 0)
+                self.device[index][4] = moving_average(self.device[index][2].lastMeasurement(), tmp)
+            elif env.FILTER_RSSI == 1:
+                self.device[index][2].filter(rssi, 0)
+            elif env.FILTER_RSSI == 2:
+                self.device[index][2] = moving_average(rssi, self.device[index][2])
 
     def get_device(self):
         output = []
@@ -53,17 +61,19 @@ class DeviceCliens(object):
                     break;
 
                 if env.DEBUG and y[0] == "FF:FF:40:00:15:0D":
-                    if env.FILTER_RSSI == 1:
+                    if env.FILTER_RSSI == 0:
+                        print ({'device_mac_address': y[0], 'signal_strength': y[4], 'length': calculate_distance(y[4], y[1])})
+                    elif env.FILTER_RSSI == 1:
                         print ({'device_mac_address': y[0], 'signal_strength': y[2].lastMeasurement(), 'length': calculate_distance(y[2].lastMeasurement(), y[1])})
                     elif env.FILTER_RSSI == 2:
-                        print({'device_mac_address': y[0], 'signal_strength': int(y[2]), 'length': calculate_distance(y[2], y[1])})    
+                        print({'device_mac_address': y[0], 'signal_strength': y[2], 'length': calculate_distance(y[2], y[1])})    
 
                 if env.FILTER_RSSI == 0:
-                    pass
+                    output.append({'device_mac_address': y[0], 'signal_strength': y[4], 'length': calculate_distance(y[4], y[1])})
                 elif env.FILTER_RSSI == 1:
-                    output.append({'device_mac_address': y[0], 'signal_strength': int(y[2].lastMeasurement()), 'length': calculate_distance(y[2].lastMeasurement(), y[1])})
+                    output.append({'device_mac_address': y[0], 'signal_strength': y[2].lastMeasurement(), 'length': calculate_distance(y[2].lastMeasurement(), y[1])})
                 elif env.FILTER_RSSI == 2:
-                    output.append({'device_mac_address': y[0], 'signal_strength': int(y[2]), 'length': calculate_distance(y[2], y[1])})
+                    output.append({'device_mac_address': y[0], 'signal_strength': y[2], 'length': calculate_distance(y[2], y[1])})
 
         return (output)
     

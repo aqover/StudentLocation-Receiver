@@ -59,5 +59,7 @@ if __name__ == '__main__':
 			print (ip)
 	except:
 		pass
-		
-	scan.scan()
+	
+	while True:
+		devices = DeviceCliens()
+		scan.scan(devices)

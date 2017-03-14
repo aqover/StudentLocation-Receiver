@@ -64,7 +64,7 @@ def send(clients):
     except Exception as e:
         pass
 
-def scan():
+def scan(devices):
     try:
         # Open the bluetooth device
         sock = bluez.hci_open_dev(0)
@@ -77,18 +77,18 @@ def scan():
         cmd_pkt = struct.pack("<BB", 0x01, 0x00)
         bluez.hci_send_cmd(sock, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, cmd_pkt)
 
-        devices = DeviceCliens()
         time_pre = datetime.datetime.now()
 
-        # Save the current filter setting
-        old_filter = sock.getsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, 14)
-
-        # Set filter for getting HCI events
-        flt = bluez.hci_filter_new()
-        bluez.hci_filter_all_events(flt)
-        bluez.hci_filter_set_ptype(flt, bluez.HCI_EVENT_PKT)
-        sock.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, flt)
         while True:
+            # Save the current filter setting
+            old_filter = sock.getsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, 14)
+
+            # Set filter for getting HCI events
+            flt = bluez.hci_filter_new()
+            bluez.hci_filter_all_events(flt)
+            bluez.hci_filter_set_ptype(flt, bluez.HCI_EVENT_PKT)
+            sock.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, flt)
+
             # Get and decode data
             buffers = sock.recv(255)
 
@@ -97,23 +97,21 @@ def scan():
                 devices.append(mac_address, rssi, tx_power)
 
             time_now = datetime.datetime.now()
-            
-            if (time_now - time_pre).total_seconds() > 2:
-                clients = devices.get_device()
-                if DEBUG:
-                    print (clients)
-                else:
-                    send(clients)
-                time_pre = time_now;
+            if (time_now - time_pre).total_seconds() > 5:
+                break
 
             #Restore the filter setting
-            #sock.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, old_filter) 
+            sock.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, old_filter) 
 
-            time.sleep(0.1)
-            if DEBUG:
-                print ("it's ok.")
+        clients = devices.get_device()
+        if DEBUG:
+            print (clients)
+        else:
+            send(clients)
 
 if __name__ == '__main__':
     DEBUG = True
     env.DEBUG = True
-    scan()
+    devices = DeviceCliens()
+    while True:
+        scan(devices)  
