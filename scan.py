@@ -54,20 +54,15 @@ def process_input(bluez_packet):
                     tx_power = struct.unpack('>b', data[-1])[0]
     return (adInfoHeader.bdaddr, rssi, tx_power)
 
-def send(devices):
+def send(clients):
     url = BASE_URL + 'sendLocation/' + MAC_ADDRESS
-    clients = devices.get_device()
 
-    if DEBUG and __name__ != '__main__':
-        print (clients)
-    
-    if not DEBUG:
-        try:
-            r = requests.get(url, data=json.dumps({'data': clients}), headers={'content-type': 'application/json'})
-            #if DEBUG:
-                #print (r.text.encode('utf-8').strip())  
-        except Exception as e:
-            pass
+    try:
+        r = requests.get(url, data=json.dumps({'data': clients}), headers={'content-type': 'application/json'})
+        #if DEBUG:
+            #print (r.text.encode('utf-8').strip())  
+    except Exception as e:
+        pass
 
 def scan():
     try:
@@ -84,16 +79,16 @@ def scan():
 
         devices = DeviceCliens()
         time_pre = datetime.datetime.now()
+
+        # Save the current filter setting
+        old_filter = sock.getsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, 14)
+
+        # Set filter for getting HCI events
+        flt = bluez.hci_filter_new()
+        bluez.hci_filter_all_events(flt)
+        bluez.hci_filter_set_ptype(flt, bluez.HCI_EVENT_PKT)
+        sock.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, flt)
         while True:
-            # Save the current filter setting
-            old_filter = sock.getsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, 14)
-
-            # Set filter for getting HCI events
-            flt = bluez.hci_filter_new()
-            bluez.hci_filter_all_events(flt)
-            bluez.hci_filter_set_ptype(flt, bluez.HCI_EVENT_PKT)
-            sock.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, flt)
-
             # Get and decode data
             buffers = sock.recv(255)
 
@@ -104,14 +99,19 @@ def scan():
             time_now = datetime.datetime.now()
             
             if (time_now - time_pre).total_seconds() > 2:
-                if not DEBUG:
-                    send(devices)
+                clients = devices.get_device()
+                if DEBUG:
+                    print (clients)
+                else:
+                    send(clients)
                 time_pre = time_now;
 
             #Restore the filter setting
-            sock.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, old_filter) 
+            #sock.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, old_filter) 
 
             time.sleep(0.1)
+            if DEBUG:
+                print ("it's ok.")
 
 if __name__ == '__main__':
     DEBUG = True
