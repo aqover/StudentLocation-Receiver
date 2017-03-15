@@ -60,6 +60,6 @@ if __name__ == '__main__':
 	except:
 		pass
 	
+	devices = DeviceCliens()
 	while True:
-		devices = DeviceCliens()
 		scan.scan(devices)

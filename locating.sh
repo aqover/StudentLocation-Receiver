@@ -78,11 +78,11 @@ update_stop() {
 case "$1" in
   start)
     start
-    update_start
+    #update_start
     ;;
   stop)
     stop
-    update_stop
+    #update_stop
     ;;
   uninstall)
     uninstall

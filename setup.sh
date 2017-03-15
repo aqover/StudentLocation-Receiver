@@ -19,25 +19,22 @@ echo "Install library-dev"
 sudo apt-get install -y libbluetooth3-dev libboost-python-dev libboost-thread-dev libbluetooth-dev libglib2.0-dev libglib2.0
 
 echo "Install requests"
-sudo pip install -t requests
+sudo pip install requests
 
 echo "Install bluetooth"
 sudo apt-get install -y bluetooth libbluetooth-dev
 
 echo "Install Bluez"
-sudo pip install -t pybluez pybluez[ble]
+sudo pip install pybluez pybluez[ble]
 
 echo "Install Gattlib"
-sudo pip install -t gattlib
+sudo pip install gattlib
 
 echo "Download program file"
+cd ~
 git clone https://github.com/aqover/StudentLocation-Receiver.git locating
 
-echo "Install crontab"
-#write out current crontab
-crontab -l > mycron
-#echo new cron into cron file
-echo "*/5 * * * * /home/fa/locating/update.py" >> mycron
-#install new cron file
-crontab mycron
-rm mycron
+cd locating
+chmod +x locating.sh
+sudo mv locating.sh /etc/init.d/locating
+update-rc.d -f locating add

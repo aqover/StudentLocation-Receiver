@@ -59,8 +59,8 @@ def send(clients):
 
     try:
         r = requests.get(url, data=json.dumps({'data': clients}), headers={'content-type': 'application/json'})
-        #if DEBUG:
-            #print (r.text.encode('utf-8').strip())  
+        if DEBUG:
+            print (r.text.encode('utf-8').strip())  
     except Exception as e:
         pass
 
@@ -106,8 +106,7 @@ def scan(devices):
         clients = devices.get_device()
         if DEBUG:
             print (clients)
-        else:
-            send(clients)
+        send(clients)
 
 if __name__ == '__main__':
     DEBUG = True

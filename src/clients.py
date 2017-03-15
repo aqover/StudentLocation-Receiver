@@ -23,6 +23,13 @@ class DeviceCliens(object):
         self.device = {}
 
     def append(self, mac_address, rssi, tx_power):
+        if env.FILTER_RANGE_TYPE < 0:
+            return;
+        elif env.FILTER_RANGE_TYPE == 0 and env.FILTER_RANGE < rssi:
+            return
+        elif env.FILTER_RANGE_TYPE == 1 and env.FILTER_RANGE < calculate_distance(rssi, tx_power):
+            return
+
         index = self._getIndex(mac_address)
         if index not in self.device:
             if env.FILTER_RSSI == 0:
@@ -38,13 +45,12 @@ class DeviceCliens(object):
         else:
             #if (datetime.datetime.now() - self.device[index][3]).total_seconds > 0.2:
             self.device[index][3] = datetime.datetime.now()
-            if env.FILTER_RSSI == 0:
-                tmp = self.device[index][2].lastMeasurement()
+            if env.FILTER_RSSI == 0 and rssi < self.device[index][4] + env.SWING_CONSTANTS:
                 self.device[index][2].filter(rssi, 0)
-                self.device[index][4] = moving_average(self.device[index][2].lastMeasurement(), tmp)
-            elif env.FILTER_RSSI == 1:
+                self.device[index][4] = moving_average(self.device[index][2].lastMeasurement(), self.device[index][4])
+            elif env.FILTER_RSSI == 1 and rssi < self.device[index][2].lastMeasurement() + env.SWING_CONSTANTS:
                 self.device[index][2].filter(rssi, 0)
-            elif env.FILTER_RSSI == 2:
+            elif env.FILTER_RSSI == 2 and rssi < self.device[index][2] + env.SWING_CONSTANTS:
                 self.device[index][2] = moving_average(rssi, self.device[index][2])
 
     def get_device(self):
@@ -60,7 +66,7 @@ class DeviceCliens(object):
                     ck = 1
                     break;
 
-                if env.DEBUG and y[0] == "FF:FF:40:00:15:0D":
+                if env.DEBUG and y[0] == env.DEBUG_MAC_FILTER:
                     if env.FILTER_RSSI == 0:
                         print ({'device_mac_address': y[0], 'signal_strength': y[4], 'length': calculate_distance(y[4], y[1])})
                     elif env.FILTER_RSSI == 1:
@@ -69,11 +75,11 @@ class DeviceCliens(object):
                         print({'device_mac_address': y[0], 'signal_strength': y[2], 'length': calculate_distance(y[2], y[1])})    
 
                 if env.FILTER_RSSI == 0:
-                    output.append({'device_mac_address': y[0], 'signal_strength': y[4], 'length': calculate_distance(y[4], y[1])})
+                    output.append({'device_mac_address': y[0], 'length': calculate_distance(y[4], y[1])})
                 elif env.FILTER_RSSI == 1:
-                    output.append({'device_mac_address': y[0], 'signal_strength': y[2].lastMeasurement(), 'length': calculate_distance(y[2].lastMeasurement(), y[1])})
+                    output.append({'device_mac_address': y[0], 'length': calculate_distance(y[2].lastMeasurement(), y[1])})
                 elif env.FILTER_RSSI == 2:
-                    output.append({'device_mac_address': y[0], 'signal_strength': y[2], 'length': calculate_distance(y[2], y[1])})
+                    output.append({'device_mac_address': y[0], 'length': calculate_distance(y[2], y[1])})
 
         return (output)
     
