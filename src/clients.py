@@ -23,9 +23,7 @@ class DeviceCliens(object):
         self.device = {}
 
     def append(self, mac_address, rssi, tx_power):
-        if env.FILTER_RANGE_TYPE < 0:
-            return;
-        elif env.FILTER_RANGE_TYPE == 0 and env.FILTER_RANGE < rssi:
+        if env.FILTER_RANGE_TYPE == 0 and env.FILTER_RANGE < rssi:
             return
         elif env.FILTER_RANGE_TYPE == 1 and env.FILTER_RANGE < calculate_distance(rssi, tx_power):
             return
