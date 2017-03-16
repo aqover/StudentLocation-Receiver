@@ -97,7 +97,7 @@ def scan(devices):
                 devices.append(mac_address, rssi, tx_power)
 
             time_now = datetime.datetime.now()
-            if (time_now - time_pre).total_seconds() > 5:
+            if (time_now - time_pre).total_seconds() > env.TIME_INTERVAL:
                 break
 
             #Restore the filter setting

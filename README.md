@@ -12,6 +12,8 @@ don't forget to create new eny.py on your machine.
 DEBUG 				= False
 DEBUG_MAC_FILTER 	= "xx:xx:xx:xx:xx:xx"
 
+TIME_INTERVAL 		= 5
+
 BASE_URL            = "http://xxxxx/"
 MAC_ADDRESS         = "xx:xx:xx:xx:xx:xx"
 

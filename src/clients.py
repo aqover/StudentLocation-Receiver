@@ -46,9 +46,9 @@ class DeviceCliens(object):
             if env.FILTER_RSSI == 0 and self.device[index][4] - env.SWING_CONSTANTS < rssi < self.device[index][4] + env.SWING_CONSTANTS:
                 self.device[index][2].filter(rssi, 0)
                 self.device[index][4] = moving_average(self.device[index][2].lastMeasurement(), self.device[index][4])
-            elif env.FILTER_RSSI == 1 and self.device[index][2].lastMeasurement() + env.SWING_CONSTANTS < rssi < self.device[index][2].lastMeasurement() + env.SWING_CONSTANTS:
+            elif env.FILTER_RSSI == 1 and self.device[index][2].lastMeasurement() - env.SWING_CONSTANTS < rssi < self.device[index][2].lastMeasurement() + env.SWING_CONSTANTS:
                 self.device[index][2].filter(rssi, 0)
-            elif env.FILTER_RSSI == 2 and self.device[index][2] + env.SWING_CONSTANTS < rssi < self.device[index][2] + env.SWING_CONSTANTS:
+            elif env.FILTER_RSSI == 2 and self.device[index][2] - env.SWING_CONSTANTS < rssi < self.device[index][2] + env.SWING_CONSTANTS:
                 self.device[index][2] = moving_average(rssi, self.device[index][2])
 
     def get_device(self):
