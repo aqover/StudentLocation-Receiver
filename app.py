@@ -3,6 +3,7 @@ import time
 
 import scan
 from src.udp_socket import Udp
+from src.clients import DeviceCliens
 
 class BLE(object):
 	"""docstring for BLE"""
